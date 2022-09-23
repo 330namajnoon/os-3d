@@ -1,177 +1,4 @@
 
-
-// let laoding = document.getElementById("laoding");
-// laoding.style.width = innerWidth + "px";
-// laoding.style.height = innerHeight + "px";
-
-
-
-/////  harekat camera  /////
-
-let harekat_ch = document.getElementById("harekat_ch");
-let harekat_ch2 = document.getElementById("harekat_ch2");
-
-let h_w = innerWidth / 5;
-let h_h = h_w;
-let x = (h_w / 2) + (innerWidth / 40);
-let y = (innerHeight - h_h) + (h_h / 2) - (innerWidth / 40);
-
-harekat_ch.style.width = h_w + "px";
-harekat_ch.style.height = h_h + "px";
-harekat_ch.style.top = innerHeight - h_h - innerWidth / 40 + "px";
-harekat_ch.style.left = innerWidth / 40 + "px";
-
-harekat_ch2.style.width = h_w / 1.5 + "px";
-harekat_ch2.style.height = h_h / 1.5 + "px";
-harekat_ch2.style.left = x - ((h_w / 1.5) / 2) + "px";
-harekat_ch2.style.top = y - ((h_h / 1.5) / 2) + "px";
-harekat_ch2.addEventListener("touchstart", (e) => {
-
-
-    x = e.changedTouches[0].pageX;
-    y = e.changedTouches[0].pageY;
-
-
-})
-
-harekat_ch2.addEventListener("touchmove", (e) => {
-    // console.log(camera.position.x)
-
-
-    x = e.changedTouches[0].pageX;
-    y = e.changedTouches[0].pageY;
-
-
-})
-harekat_ch2.addEventListener("touchend", () => {
-    x = (h_w / 2) + (innerWidth / 40);
-    y = (innerHeight - h_h) + (h_h / 2) - (innerWidth / 40);
-})
-
-let cameralocationdraw = function () {
-    if (x - ((h_w / 1.5) / 2) > innerWidth / 40 && x + ((h_w / 1.5) / 2) < (innerWidth / 40) + h_w) {
-        harekat_ch2.style.left = x - ((h_w / 1.5) / 2) + "px";
-    }
-    if (y - ((h_h / 1.5) / 2) > (innerHeight - h_h - (innerWidth / 40)) && y + ((h_h / 1.5) / 2) < (innerHeight - (innerWidth / 40))) {
-
-        harekat_ch2.style.top = y - ((h_h / 1.5) / 2) + "px";
-    }
-}
-let cameralocationupdate = function () {
-    if (y < (innerHeight - h_h) + (h_h / 2) - (innerWidth / 40)) {
-        let y1 = ((innerHeight - h_h) + (h_h / 2) - (innerWidth / 40)) - y
-        // camera.position.z += -(((innerHeight - h_h) + (h_h / 2) - (innerWidth / 40)) - y) / 10
-        controls.moveForward((((innerHeight - h_h) + (h_h / 2) - (innerWidth / 40)) - y) / 10);
-
-    }
-    if (y > (innerHeight - h_h) + (h_h / 2) - (innerWidth / 40)) {
-        let y1 = ((innerHeight - h_h) + (h_h / 2) - (innerWidth / 40)) - y
-        // camera.position.z += -(((innerHeight - h_h) + (h_h / 2) - (innerWidth / 40)) - y) / 10
-        controls.moveForward((((innerHeight - h_h) + (h_h / 2) - (innerWidth / 40)) - y) / 10)
-    }
-
-    if (x < ((h_w / 2) + (innerWidth / 40))) {
-        let y1 = ((innerHeight - h_h) + (h_h / 2) - (innerWidth / 40)) - y
-        // camera.position.x += -(((h_w / 2) + (innerWidth / 40)) - x) / 10
-        controls.moveRight(-(((h_w / 2) + (innerWidth / 40)) - x) / 10)
-    }
-    if (x > ((h_w / 2) + (innerWidth / 40))) {
-        let y1 = ((innerHeight - h_h) + (h_h / 2) - (innerWidth / 40)) - y
-        // camera.position.x += -(((h_w / 2) + (innerWidth / 40)) - x) / 10
-        controls.moveRight(-(((h_w / 2) + (innerWidth / 40)) - x) / 10)
-
-    }
-}
-
-
-
-let sina = {
-    name: "sina"
-}
-
-Object.assign(sina, { famili: "ff" });
-
-
-
-
-
-
-///////////////////////////
-
-/////  camera rotation  /////
-let harekat_r = document.getElementById("harekat_r");
-let harekat_r2 = document.getElementById("harekat_r2");
-let xr = ((innerWidth - h_h) - (innerWidth / 40) + h_w / 2);
-let yr = ((innerHeight - h_h) - (innerWidth / 40) + h_h / 2);
-harekat_r.style.width = h_w + "px";
-harekat_r.style.height = h_h + "px";
-harekat_r.style.top = (innerHeight - h_h) - (innerWidth / 40) + "px";
-harekat_r.style.left = (innerWidth - h_h) - (innerWidth / 40) + "px";
-
-harekat_r2.style.width = h_w / 1.5 + "px";
-harekat_r2.style.height = h_h / 1.5 + "px";
-harekat_r2.style.left = xr - ((h_w / 1.5) / 2) + "px";
-harekat_r2.style.top = yr - ((h_h / 1.5) / 2) + "px";
-
-harekat_r2.addEventListener("touchstart", (e) => {
-
-
-    xr = e.changedTouches[0].pageX;
-    yr = e.changedTouches[0].pageY;
-
-
-})
-
-harekat_r2.addEventListener("touchmove", (e) => {
-
-
-    xr = e.changedTouches[0].pageX;
-    yr = e.changedTouches[0].pageY;
-
-
-})
-harekat_r2.addEventListener("touchend", () => {
-    xr = ((innerWidth - h_h) - (innerWidth / 40) + h_w / 2);
-    yr = ((innerHeight - h_h) - (innerWidth / 40) + h_h / 2);
-})
-
-let camerarotationdraw = function () {
-    if (xr - ((h_w / 1.5) / 2) > (innerWidth - (innerWidth / 40) - h_w) && xr + ((h_w / 1.5) / 2) < innerWidth - (innerWidth / 40)) {
-        harekat_r2.style.left = xr - ((h_w / 1.5) / 2) + "px";
-    }
-    if (yr - ((h_h / 1.5) / 2) > (innerHeight - h_h - (innerWidth / 40)) && yr + ((h_h / 1.5) / 2) < innerHeight - (innerWidth / 40)) {
-
-        harekat_r2.style.top = yr - ((h_h / 1.5) / 2) + "px";
-    }
-}
-let camerarotationupdate = function () {
-    // if (yr < (((innerHeight - h_h) - (innerWidth / 40)+h_h/2))) {
-
-    //     camera.rotation.x += -(((innerHeight - h_h) - (innerWidth / 40)+h_h/2) - yr) / 5000
-    // }
-    // if (yr > (((innerHeight - h_h) - (innerWidth / 40)+h_h/2))) {
-
-    //     camera.rotation.x += -(((innerHeight - h_h) - (innerWidth / 40)+h_h/2) - yr) / 5000
-
-    // }
-
-    if (xr < (((innerWidth - h_h) - (innerWidth / 40) + h_w / 2))) {
-
-        camera.rotation.y += (((innerWidth - h_h) - (innerWidth / 40) + h_w / 2) - xr) / 5000
-
-    }
-    if (xr > (((innerWidth - h_h) - (innerWidth / 40) + h_w / 2))) {
-
-        camera.rotation.y += (((innerWidth - h_h) - (innerWidth / 40) + h_w / 2) - xr) / 5000
-
-
-    }
-}
-
-/////////////////////////////
-
-
-
 import * as THREE from 'https://unpkg.com/three@0.127.0/build/three.module.js';
 
 
@@ -181,6 +8,7 @@ import Stats from 'https://unpkg.com/three@0.127.0/examples/jsm/libs/stats.modul
 import { OrbitControls } from 'https://unpkg.com/three@0.127.0/examples/jsm/controls/OrbitControls.js';
 import { PointerLockControls } from 'https://unpkg.com/three@0.127.0/examples/jsm/controls/PointerLockControls.js';
 import { FBXLoader } from 'https://unpkg.com/three@0.127.0/examples/jsm/loaders/FBXLoader.js';
+import { GLTFLoader } from 'https://unpkg.com/three@0.127.0/examples/jsm/loaders/GLTFLoader.js';
 import { RGBELoader } from 'https://unpkg.com/three@0.127.0/examples/jsm/loaders/RGBELoader.js';
 
 let htriTextureURL = new URL('../house/textures/soliltude_4k.hdr', import.meta.url);
@@ -307,7 +135,7 @@ function init() {
 
 
     ///// loader  /////
-    loader = new FBXLoader();
+    loader = new GLTFLoader();
 
     const rgbeloder = new RGBELoader();
     rgbeloder.load(htriTextureURL, function (tex) {
@@ -333,7 +161,7 @@ function init() {
 
 
 
-    addfbxmodels(2, "tezgah1", "darvaze.fbx", 200, 0, 200);
+    addfbxmodels(2, "tezgah1", "darvaze.glb", 0, 0, 0);
     // addfbxmodels(2, "tezgah2", "tezgah2.fbx", 200, 0, 200);
     // addfbxmodels(2, "ahsap1", "ahsap1.fbx", 200, 0, 200);
     // addfbxmodels(2, "ahsap2", "ahsap2.fbx", 200, 0, 200);
@@ -523,34 +351,66 @@ function addobject(name, w, h, d, x, y, z, color) {
 }
 
 function addfbxmodels(tedad, name, path, x, y, z) {
-    loader.load('../house/' + path, function (object) {
-        object.name = name;
-
-        actid.push(object.id);
-        actdurum.push(0)
-        tedadanim.push(tedad);
-
-        // object.position.set(x, y, z);
+    // loader.load('../house/' + path, function (object) {
 
 
-        object.castShadow = true;
-        object.receiveShadow = true;
+    //     object.name = name;
 
-        object.traverse(function (child) {
+    //     actid.push(object.id);
+    //     actdurum.push(0)
+    //     tedadanim.push(tedad);
 
-            if (child.isMesh) {
-
-                child.castShadow = true;
-                child.receiveShadow = true;
-
-            }
-
-        });
-
-        scene.add(object);
+    //     // object.position.set(x, y, z);
 
 
-    });
+    //     object.castShadow = true;
+    //     object.receiveShadow = true;
+
+    //     object.traverse(function (child) {
+
+    //         if (child.isMesh) {
+
+    //             child.castShadow = true;
+    //             child.receiveShadow = true;
+
+    //         }
+
+    //     });
+
+    //     scene.add(object);
+
+
+    // });
+
+    ////////// GLB
+    loader.load(
+        // resource URL
+        '../house/' + path,
+        // called when the resource is loaded
+        function ( gltf ) {
+    
+            scene.add( gltf.scene );
+    
+            gltf.animations; // Array<THREE.AnimationClip>
+            gltf.scene; // THREE.Group
+            gltf.scenes; // Array<THREE.Group>
+            gltf.cameras; // Array<THREE.Camera>
+            gltf.asset; // Object
+    
+        },
+        // called while loading is progressing
+        function ( xhr ) {
+    
+            console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+    
+        },
+        // called when loading has errors
+        function ( error ) {
+    
+            console.log( 'An error happened' );
+    
+        }
+    );
 }
 function addfbxmodels1(tedad, name, path, x, y, z) {
     loader.load('../public/house/' + path, function (object) {
@@ -603,10 +463,6 @@ function animate() {
 
     requestAnimationFrame(animate);
 
-    cameralocationdraw();
-    cameralocationupdate();
-    camerarotationdraw();
-    camerarotationupdate();
 
 
     const delta = clock.getDelta();
