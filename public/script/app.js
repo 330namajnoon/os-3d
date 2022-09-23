@@ -392,10 +392,19 @@ function addfbxmodels(tedad, name, path, x, y, z) {
             scene.add( gltf.scene );
     
             gltf.animations; // Array<THREE.AnimationClip>
+            console.log(gltf);
             gltf.scene; // THREE.Group
             gltf.scenes; // Array<THREE.Group>
             gltf.cameras; // Array<THREE.Camera>
             gltf.asset; // Object
+
+            // mixer = new THREE.AnimationMixer(gltf);
+            // let action = mixer.clipAction(gltf.animations[0]);
+            // action.setLoop(THREE.LoopOnce);
+            // action.clampWhenFinished = true;
+            // action.enable = true;
+
+            action.play();
     
         },
         // called while loading is progressing
