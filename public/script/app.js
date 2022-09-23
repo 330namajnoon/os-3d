@@ -161,7 +161,7 @@ function init() {
 
 
 
-    addfbxmodels(2, "tezgah1", "darvaze.glb", 0, 0, 0);
+    addgltfmodels(2, "darvaze", "darvaze.glb", 0, 0, 0);
     // addfbxmodels(2, "tezgah2", "tezgah2.fbx", 200, 0, 200);
     // addfbxmodels(2, "ahsap1", "ahsap1.fbx", 200, 0, 200);
     // addfbxmodels(2, "ahsap2", "ahsap2.fbx", 200, 0, 200);
@@ -214,18 +214,22 @@ function init() {
 
 
 /////  select  /////
-const raycaster = new THREE.Raycaster();
-const click = new THREE.Vector2();
-window.addEventListener("click", event => {
+window.addEventListener("click",e => {
+    select_animacions(e)
+});
+window.addEventListener("touchstart",e => {
+    select_animacions(e.touches[0]);
+});
+function select_animacions(event) {
+        let raycaster = new THREE.Raycaster();
+        let click = new THREE.Vector2();
     
-    
-        var mouse = new THREE.Vector2();
+        
         click.x = (event.layerX / innerWidth) * 2 - 1;
         click.y = -(event.layerY / innerHeight) * 2 + 1;
        
         raycaster.setFromCamera(click, camera);
         var intersects = raycaster.intersectObjects(scene.children);
-        console.log(intersects)
         if (intersects.length > 0) {
             console.log(intersects);
             let object = scene.getObjectById(intersects[0].object.id - 1)
@@ -267,15 +271,9 @@ window.addEventListener("click", event => {
 
             }
         }
+}
 
-
-
-    
-
-
-})
-
-document.getElementById("sahne").addEventListener("mousedown", onDocumentMouseDown2, false);
+// document.getElementById("sahne").addEventListener("mousedown", onDocumentMouseDown2, false);
 function onDocumentMouseDown2(event) {
     console.log(event)
     if (event.button == 0) {
@@ -353,76 +351,74 @@ function addobject(name, w, h, d, x, y, z, color) {
 }
 
 function addfbxmodels(tedad, name, path, x, y, z) {
-    // loader.load('../house/' + path, function (object) {
+    loader.load('../house/' + path, function (object) {
 
 
-    //     object.name = name;
+        object.name = name;
 
-    //     actid.push(object.id);
-    //     actdurum.push(0)
-    //     tedadanim.push(tedad);
+        actid.push(object.id);
+        actdurum.push(0)
+        tedadanim.push(tedad);
 
-    //     // object.position.set(x, y, z);
-
-
-    //     object.castShadow = true;
-    //     object.receiveShadow = true;
-
-    //     object.traverse(function (child) {
-
-    //         if (child.isMesh) {
-
-    //             child.castShadow = true;
-    //             child.receiveShadow = true;
-
-    //         }
-
-    //     });
-
-    //     scene.add(object);
+        // object.position.set(x, y, z);
 
 
-    // });
+        object.castShadow = true;
+        object.receiveShadow = true;
+
+        object.traverse(function (child) {
+
+            if (child.isMesh) {
+
+                child.castShadow = true;
+                child.receiveShadow = true;
+
+            }
+
+        });
+
+        scene.add(object);
+
+
+    });
 
     ////////// GLB
-    loader.load(
-        // resource URL
-        '../house/' + path,
-        // called when the resource is loaded
-        function ( gltf ) {
-    
-            scene.add( gltf.scene );
-    
-            gltf.animations; // Array<THREE.AnimationClip>
-            console.log(gltf);
-            gltf.scene; // THREE.Group
-            gltf.scenes; // Array<THREE.Group>
-            gltf.cameras; // Array<THREE.Camera>
-            gltf.asset; // Object
+   
+}
+function addgltfmodels(tedad, name, path, x, y, z) {
+   
+    loader = new GLTFLoader();
+    loader.load('../house/' + path, function (object) {
 
-            mixer = new THREE.AnimationMixer(gltf.scene);
-            let action = mixer.clipAction(gltf.animations[0]);
-            console.log(action);
-            action.setLoop(THREE.LoopOnce);
-            action.clampWhenFinished = true;
-            action.enable = true;
 
-            action.play();
-    
-        },
-        // called while loading is progressing
-        function ( xhr ) {
-    
-            console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-    
-        },
-        // called when loading has errors
-        function ( error ) {
-    
-            console.log( 'An error happened' );
-    
-        }
-    );
+        object.name = name;
+
+        actid.push(object.id);
+        actdurum.push(0)
+        tedadanim.push(tedad);
+
+        // object.position.set(x, y, z);
+
+
+        object.castShadow = true;
+        object.receiveShadow = true;
+
+        // object.traverse(function (child) {
+
+        //     if (child.isMesh) {
+
+        //         child.castShadow = true;
+        //         child.receiveShadow = true;
+
+        //     }
+
+        // });
+
+        scene.add(object.scene);
+        console.log(scene)
+
+
+    });
 }
 function addfbxmodels1(tedad, name, path, x, y, z) {
     loader.load('../public/house/' + path, function (object) {
