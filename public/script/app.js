@@ -18,6 +18,7 @@ export let camera, scene, renderer, stats, controls, loader;
 const clock = new THREE.Clock();
 
 let mixer;
+let objects = {};
 
 let actid = [];
 let actdurum = [];
@@ -48,9 +49,9 @@ function init() {
 
     /////camera/////
 
-    camera = new THREE.PerspectiveCamera(100, window.innerWidth / window.innerHeight, 1, 2000);
-    camera.rotation.set(0, 88.635, 0)
-    camera.position.set(838, 247, 851)
+    camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 2000);
+    camera.rotation.set(0,0, 0)
+    camera.position.set(100, 80, 0)
 
     // camera.lookAt(new THREE.Vector3(10, 0, 0))
 
@@ -61,8 +62,8 @@ function init() {
 
     /////scene/////
     scene = new THREE.Scene();
-    scene.background = new THREE.Color(0xa0a0a0);
-    // scene.fog = new THREE.Fog(0xa0a0a0, 200, 1000);
+    scene.background = new THREE.Color(0x000000);
+    scene.fog = new THREE.Fog(0x000000, 200, 500);
     ///////////////
 
 
@@ -101,7 +102,7 @@ function init() {
 
     ///// control  //////
     const controls = new OrbitControls(camera, renderer.domElement);
-    controls.target.set(0, 100, 0);
+    controls.target.set(0, 80, 0);
     controls.update();
 
     // controls = new PointerLockControls(camera, document.body);
@@ -147,7 +148,7 @@ function init() {
 
     //////lights/////
     var ambientlight = new THREE.AmbientLight(0xaaaaaa, 1);
-    scene.add(ambientlight);
+    // scene.add(ambientlight);
 
 
     addspotlight('light2', 1, new THREE.Color(1, 1, 1), new THREE.Vector3(583, 486, 171));
@@ -161,11 +162,11 @@ function init() {
 
 
 
-    addgltfmodels(2, "darvaze", "darvaze.glb", 0, 0, 0);
-    // addfbxmodels(2, "tezgah2", "tezgah2.fbx", 200, 0, 200);
-    // addfbxmodels(2, "ahsap1", "ahsap1.fbx", 200, 0, 200);
-    // addfbxmodels(2, "ahsap2", "ahsap2.fbx", 200, 0, 200);
-    // addfbxmodels(2, "ahsap2", "parket.fbx", 200, 0, 200);
+    let object = new AddGltfmodels(2, "darvaze", "darvaze.glb", 0, 0, 0);
+    let dar_chap = new AddGltfmodels(2, "dar_chap", "dar_chap.glb", 0, 0, 0);
+    let dar_rast = new AddGltfmodels(2, "dar_rast", "dar_rast.glb", 0, 0, 0);
+
+    console.log(object)
 
     let s_x = -innerWidth / 25;
     for (let index = 1; index <= 4; index++) {
@@ -385,23 +386,32 @@ function addfbxmodels(tedad, name, path, x, y, z) {
     ////////// GLB
    
 }
-function addgltfmodels(tedad, name, path, x, y, z) {
-   
-    loader = new GLTFLoader();
-    loader.load('../house/' + path, function (object) {
+function mixer_(object,index) {
+    mixer = new THREE.AnimationMixer(object);
+    let action = mixer.clipAction(object.animations[index]);
+    action.setLoop(THREE.LoopOnce);
+    action.clampWhenFinished = true;
+    action.enable = true;
 
+    action.play();
+}
 
-        object.name = name;
+function AddGltfmodels(tedad, name, path, x, y, z) {
+    this.loader = new GLTFLoader();
+    this.loader.load('../house/' + path, function (object) {
 
-        actid.push(object.id);
+        
+        object.scene.name = name;
+
+        actid.push(object.scene.id);
         actdurum.push(0)
         tedadanim.push(tedad);
 
         // object.position.set(x, y, z);
 
 
-        object.castShadow = true;
-        object.receiveShadow = true;
+        object.scene.castShadow = true;
+        object.scene.receiveShadow = true;
 
         // object.traverse(function (child) {
 
@@ -413,12 +423,14 @@ function addgltfmodels(tedad, name, path, x, y, z) {
         //     }
 
         // });
-
+        
         scene.add(object.scene);
-        console.log(scene)
+        objects[name] = object;
 
+        console.log(objects)
 
     });
+
 }
 function addfbxmodels1(tedad, name, path, x, y, z) {
     loader.load('../public/house/' + path, function (object) {
