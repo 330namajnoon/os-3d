@@ -1,15 +1,15 @@
 
-import * as THREE from 'https://unpkg.com/three@0.127.0/build/three.module.js';
+import * as THREE from 'three';
 
 
 
-import Stats from 'https://unpkg.com/three@0.127.0/examples/jsm/libs/stats.module.js';
+import Stats from './jsm/libs/stats.module.js';
 
-import { OrbitControls } from 'https://unpkg.com/three@0.127.0/examples/jsm/controls/OrbitControls.js';
-import { PointerLockControls } from 'https://unpkg.com/three@0.127.0/examples/jsm/controls/PointerLockControls.js';
-import { FBXLoader } from 'https://unpkg.com/three@0.127.0/examples/jsm/loaders/FBXLoader.js';
-import { GLTFLoader } from 'https://unpkg.com/three@0.127.0/examples/jsm/loaders/GLTFLoader.js';
-import { RGBELoader } from 'https://unpkg.com/three@0.127.0/examples/jsm/loaders/RGBELoader.js';
+import { OrbitControls } from './jsm/controls/OrbitControls.js';
+import { PointerLockControls } from './jsm/controls/PointerLockControls.js';
+import { FBXLoader } from './jsm/loaders/FBXLoader.js';
+import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
+import { RGBELoader } from './jsm/loaders/RGBELoader.js';
 
 let htriTextureURL = new URL('../house/textures/soliltude_4k.hdr', import.meta.url);
 export let camera, scene, renderer, stats, controls, loader;
@@ -214,18 +214,20 @@ function init() {
 
 
 /////  select  /////
-document.getElementById("sahne").addEventListener("mousedown", onDocumentMouseDown, false);
-function onDocumentMouseDown(event) {
-
-    if (event.button == 0) {
+const raycaster = new THREE.Raycaster();
+const click = new THREE.Vector2();
+window.addEventListener("click", event => {
+    
+    
         var mouse = new THREE.Vector2();
-        mouse.x = (event.layerX / $('#sahne').width()) * 2 - 1;
-        mouse.y = -(event.layerY / $('#sahne').height()) * 2 + 1;
-        var raycaster = new THREE.Raycaster();
-        raycaster.setFromCamera(mouse, camera);
+        click.x = (event.layerX / innerWidth) * 2 - 1;
+        click.y = -(event.layerY / innerHeight) * 2 + 1;
+       
+        raycaster.setFromCamera(click, camera);
         var intersects = raycaster.intersectObjects(scene.children);
+        console.log(intersects)
         if (intersects.length > 0) {
-
+            console.log(intersects);
             let object = scene.getObjectById(intersects[0].object.id - 1)
             if (object.animations.length > 0) {
 
@@ -268,10 +270,10 @@ function onDocumentMouseDown(event) {
 
 
 
-    }
+    
 
 
-}
+})
 
 document.getElementById("sahne").addEventListener("mousedown", onDocumentMouseDown2, false);
 function onDocumentMouseDown2(event) {
@@ -398,11 +400,12 @@ function addfbxmodels(tedad, name, path, x, y, z) {
             gltf.cameras; // Array<THREE.Camera>
             gltf.asset; // Object
 
-            // mixer = new THREE.AnimationMixer(gltf);
-            // let action = mixer.clipAction(gltf.animations[0]);
-            // action.setLoop(THREE.LoopOnce);
-            // action.clampWhenFinished = true;
-            // action.enable = true;
+            mixer = new THREE.AnimationMixer(gltf.scene);
+            let action = mixer.clipAction(gltf.animations[0]);
+            console.log(action);
+            action.setLoop(THREE.LoopOnce);
+            action.clampWhenFinished = true;
+            action.enable = true;
 
             action.play();
     
