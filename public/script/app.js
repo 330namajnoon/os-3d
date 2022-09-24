@@ -163,8 +163,8 @@ function init() {
 
 
     let object = new AddGltfmodels(2, "darvaze", "darvaze.glb", 0, 0, 0);
-    let dar_chap = new AddGltfmodels(2, "dar_chap", "dar_chap.glb", 0, 0, 0);
-    let dar_rast = new AddGltfmodels(2, "dar_rast", "dar_rast.glb", 0, 0, 0);
+    // let dar_chap = new AddGltfmodels(2, "dar_chap", "dar_chap.glb", 0, 0, 0);
+    // let dar_rast = new AddGltfmodels(2, "dar_rast", "dar_rast.gltf", 0, 0, 0);
 
     console.log(object)
 
@@ -232,45 +232,14 @@ function select_animacions(event) {
         raycaster.setFromCamera(click, camera);
         var intersects = raycaster.intersectObjects(scene.children);
         if (intersects.length > 0) {
-            console.log(intersects);
-            let object = scene.getObjectById(intersects[0].object.id - 1)
-            if (object.animations.length > 0) {
-
-                let actidd = actid.indexOf(object.id)
-                let tedad = tedadanim[actidd];
-                if (tedad == object.animations.length) {
-                    tedad = 0;
-                } else {
-                    tedad = object.animations.length - tedadanim[actidd]
-                }
-
-
-                if (actdurum[actidd] > 0 && actdurum[actidd] < object.animations.length - tedad) {
-
-                    let index = actdurum[actidd];
-                    mixer = new THREE.AnimationMixer(object);
-                    const action = mixer.clipAction(object.animations[index]);
-                    action.setLoop(THREE.LoopOnce);
-                    action.clampWhenFinished = true;
-                    action.enable = true;
-
-                    action.play();
-                    actdurum[actidd] += 1;
-                } else {
-                    actdurum[actidd] = 0
-                    let index = actdurum[actidd];
-                    mixer = new THREE.AnimationMixer(object);
-                    const action = mixer.clipAction(object.animations[index]);
-                    action.setLoop(THREE.LoopOnce);
-                    action.clampWhenFinished = true;
-                    action.enable = true;
-
-                    action.play();
-                    actdurum[actidd] = 1;
-
-                }
-
-            }
+            
+            
+            let name = intersects[0].object.name;
+            console.log(name);
+            let object = scene.getObjectByName(name)
+            objects[name].play(name);
+            console.log(object);
+           
         }
 }
 
@@ -386,15 +355,28 @@ function addfbxmodels(tedad, name, path, x, y, z) {
     ////////// GLB
    
 }
-function mixer_(object,index) {
-    mixer = new THREE.AnimationMixer(object);
-    let action = mixer.clipAction(object.animations[index]);
-    action.setLoop(THREE.LoopOnce);
-    action.clampWhenFinished = true;
-    action.enable = true;
-
-    action.play();
+function Animacion(object) {
+    this.object = object;
+    this.tedad_animacion = this.object.animations.length;
+    this.animacion_durum = 0;
 }
+Animacion.prototype.play = function(name) {
+    let object = scene.getObjectByName(name);
+    if(this.animacion_durum > this.tedad_animacion-1) {
+        this.animacion_durum = 0;
+    }
+    if(this.tedad_animacion > 0 ){
+        mixer = new THREE.AnimationMixer(object);
+        let action = mixer.clipAction(object.animations[this.animacion_durum]);
+        action.setLoop(THREE.LoopOnce);
+        action.clampWhenFinished = true;
+        action.enable = true;
+
+        action.play();
+        this.animacion_durum++;
+    }
+}
+
 
 function AddGltfmodels(tedad, name, path, x, y, z) {
     this.loader = new GLTFLoader();
@@ -402,11 +384,37 @@ function AddGltfmodels(tedad, name, path, x, y, z) {
 
         
         object.scene.name = name;
-
-        actid.push(object.scene.id);
-        actdurum.push(0)
-        tedadanim.push(tedad);
-
+        object.scene.animations = object.animations;
+       
+        object.scene.children.forEach(element => {
+            object.animations.forEach(e => {
+                let name = element.name;
+                let name1 = name.split("");
+                let name2 = e.name;
+                let name3 = name2.split("");
+                let name1_length = name1.length;
+                let shomar = 0;
+                for (let index = 0; index < name1.length; index++) {
+                    let a = name1[index];
+                    let b = name3[index];
+                    if (a == b) {
+                        shomar++;
+                    }
+                    
+                }
+                if(shomar == name1.length) {
+                    element.animations.push(e);
+                }
+                
+            })
+            // element.animations = object.animations;
+            element.children.forEach(element_ => {
+                element_.animations = object.animations;
+                element_.name = element.name;
+            })
+            objects[element.name] = new Animacion(element);
+        });
+       
         // object.position.set(x, y, z);
 
 
@@ -425,7 +433,7 @@ function AddGltfmodels(tedad, name, path, x, y, z) {
         // });
         
         scene.add(object.scene);
-        objects[name] = object;
+       
 
         console.log(objects)
 
