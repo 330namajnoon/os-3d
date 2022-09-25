@@ -10,8 +10,12 @@ import { PointerLockControls } from './jsm/controls/PointerLockControls.js';
 import { FBXLoader } from './jsm/loaders/FBXLoader.js';
 import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 import { RGBELoader } from './jsm/loaders/RGBELoader.js';
+import {EffectComposer} from './jsm/postprocessing/EffectComposer.js';
+import {RenderPass} from './jsm/postprocessing/RenderPass.js';
+import {UnrealBloomPass} from './jsm/postprocessing/UnrealBloomPass.js';
+import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
 
-let htriTextureURL = new URL('../house/textures/soliltude_4k.hdr', import.meta.url);
+let htriTextureURL = new URL('../textures/htri.exr.', import.meta.url);
 export let camera, scene, renderer, stats, controls, loader;
 
 
@@ -92,6 +96,7 @@ function init() {
     renderer.outputEncoding = THREE.sRGBEncoding;
     renderer.shadowMap.enabled = true;
     renderer.toneMapping = THREE.ReinhardToneMapping;
+    renderer.toneMappingExposure = 1;
     renderer.setPixelRatio(window.devicePixelRatio);
 
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -109,17 +114,17 @@ function init() {
 
     // add event listener to show/hide a UI (e.g. the game's menu)
 
-    controls.addEventListener('lock', function () {
+    // controls.addEventListener('lock', function () {
 
-        menu.style.display = 'none';
+    //     menu.style.display = 'none';
 
-    });
+    // });
 
-    controls.addEventListener('unlock', function () {
+    // controls.addEventListener('unlock', function () {
 
-        menu.style.display = 'block';
+    //     menu.style.display = 'block';
 
-    });
+    // });
 
     //////////////////////
 
@@ -138,22 +143,22 @@ function init() {
     ///// loader  /////
     loader = new GLTFLoader();
 
-    const rgbeloder = new RGBELoader();
-    rgbeloder.load(htriTextureURL, function (tex) {
-        tex.mapping = THREE.EquirectangularReflectionMapping;
-        // scene.background = tex;
-        scene.environment = tex;
-    })
+    // const rgbeloder = new RGBELoader();
+    // rgbeloder.load(htriTextureURL, function (tex) {
+    //     tex.mapping = THREE.EquirectangularReflectionMapping;
+    //     // scene.background = tex;
+    //     scene.environment = tex;
+    // })
     ///////////////////
 
     //////lights/////
-    var ambientlight = new THREE.AmbientLight(0xaaaaaa, 1);
+    var ambientlight = new THREE.AmbientLight(0xaaaaaa, 10);
     // scene.add(ambientlight);
 
 
-    addspotlight('light2', 1, new THREE.Color(1, 1, 1), new THREE.Vector3(583, 486, 171));
-    addspotlight('light1', 1, new THREE.Color(1, 1, 1), new THREE.Vector3(226, 410, 529));
-
+    addspotlight('light1', 1, new THREE.Color(1, 1, 1), new THREE.Vector3(100, 150, 0));
+    
+   
 
 
     //////////////////
@@ -163,10 +168,7 @@ function init() {
 
 
     let object = new AddGltfmodels(2, "darvaze", "darvaze.glb", 0, 0, 0);
-    // let dar_chap = new AddGltfmodels(2, "dar_chap", "dar_chap.glb", 0, 0, 0);
-    // let dar_rast = new AddGltfmodels(2, "dar_rast", "dar_rast.gltf", 0, 0, 0);
-
-    console.log(object)
+   
 
     let s_x = -innerWidth / 25;
     for (let index = 1; index <= 4; index++) {
@@ -183,7 +185,7 @@ function init() {
     }
 
 
-    // addfbxmodels1(2, "cube2", "lamp.fbx", 200, 0, 200);
+    
 
     ////////////////////////
 
@@ -198,16 +200,10 @@ function init() {
 
 
     ///////////////////////
-    // gui.add(camera.getObjectByName('dayere').position, 'x', -1000, 2000);
-    // gui.add(camera.getObjectByName('dayere').position, 'y', -1000, 2000);
-    // gui.add(camera.getObjectByName('dayere').position, 'z', -1000, 2000);
-
-
-
-
-
-
-
+    gui.add(scene.getObjectByName('light1').position, "x",0);
+    gui.add(scene.getObjectByName('light1').position, 'y', 0);
+    gui.add(scene.getObjectByName('light1').position, 'z', 0);
+   
 
 
 }
@@ -278,7 +274,7 @@ function onDocumentMouseDown2(event) {
 
 /////  add light  /////
 function addspotlight(name, intensity, color, pos) {
-    const spotLight = new THREE.PointLight(0xffffff, .5);
+    const spotLight = new THREE.SpotLight(0xffffff, .5);
     spotLight.name = name
     spotLight.position.set(pos.x, pos.y, pos.z);
     spotLight.castShadow = true;
@@ -288,7 +284,7 @@ function addspotlight(name, intensity, color, pos) {
     spotLight.shadow.camera.far = 4000;
     spotLight.shadow.camera.fov = 30;
     // spotLight.decay = 1000;
-    spotLight.power = 9;
+    spotLight.power = 10;
     // spotLight.distance = 1;
 
     scene.add(spotLight);
@@ -382,7 +378,8 @@ function AddGltfmodels(tedad, name, path, x, y, z) {
     this.loader = new GLTFLoader();
     this.loader.load('../house/' + path, function (object) {
 
-        
+       
+       
         object.scene.name = name;
         object.scene.animations = object.animations;
        
@@ -411,6 +408,7 @@ function AddGltfmodels(tedad, name, path, x, y, z) {
             element.children.forEach(element_ => {
                 element_.animations = object.animations;
                 element_.name = element.name;
+               
             })
             objects[element.name] = new Animacion(element);
         });
@@ -431,53 +429,14 @@ function AddGltfmodels(tedad, name, path, x, y, z) {
         //     }
 
         // });
-        
-        scene.add(object.scene);
        
-
-        console.log(objects)
-
-    });
-
-}
-function addfbxmodels1(tedad, name, path, x, y, z) {
-    loader.load('../public/house/' + path, function (object) {
-        // object.name = name;
-
-        actid.push(object.id);
-        actdurum.push(0)
-        tedadanim.push(tedad);
-
-        object.material = new THREE.MeshLambertMaterial({
-            emissive: new THREE.Color(0.2, 0.3, 0.3),
-            emissiveIntensity: 10,
-        });
-
-        // object.position.set(x, y, z);
-
-
-        object.castShadow = true;
-        object.receiveShadow = true;
-
-        object.traverse(function (child) {
-
-            if (child.isMesh) {
-
-                child.castShadow = true;
-                child.receiveShadow = true;
-
-            }
-
-        });
-
-        scene.add(object);
+        scene.add(object.scene);
+        
 
     });
+
 }
 
-setTimeout(hide, 1000);
-function hide() {
-}
 
 
 
@@ -506,10 +465,10 @@ function animate() {
 //////////////////////////
 
 /////  taghir rang  /////
-// let taghirrang_time = setInterval(taghirrang, 1000);
+let taghirrang_time = setInterval(taghirrang, 1000);
 function taghirrang() {
     console.log(scene.children.length)
-    if (scene.children.length >= 0) {
+    if (scene.children.length >= 3) {
         // document.getElementById("laoding").remove();
         ////////
         let shishe_sharab = new THREE.MeshPhysicalMaterial({ roughness: 0, transmission: 1, thickness: 2, color: new THREE.Color(0x121212) });
@@ -524,62 +483,27 @@ function taghirrang() {
             roughness: 0.1,
             metalness: 1
         });
-        for (let index0 = 0; index0 < scene.children.length; index0++) {
-            let name = scene.children[index0].name;
+        let lamp_ghermez = new THREE.MeshStandardMaterial({
+            emissive: new THREE.Color("#ff0000"),
+            color: new THREE.Color("#ff0000"),
+            
+        });
 
-            if (name == "ahshap1" || name == "ahshap2" || name == "tezgah1" || name == "tezgah2") {
-
-                for (let index = 0; index < scene.getObjectByName(name).children.length; index++) {
-
-                    for (let index1 = 0; index1 < scene.getObjectByName(name).children[index].material.length; index1++) {
-                        if (scene.getObjectByName(name).children[index].material[index1].name == "Material.002") {
-                            scene.getObjectByName(name).children[index].material[index1] = shishe_sharab;
-
-
-                        }
-
-                        if (scene.getObjectByName(name).children[index].material[index1].name == "jamesharab") {
-                            scene.getObjectByName(name).children[index].material[index1] = jame_sharab;
-
-
-
-                        }
-
-                        if (scene.getObjectByName(name).children[index].material[index1].name == "Default OBJ.009") {
-                            scene.getObjectByName(name).children[index].material[index1] = metal;
-
-
-                        }
-
-
+        scene.children.forEach(element1 => {
+            element1.children.forEach(element2 => {
+                element2.children.forEach(element3 => {
+                    if (element3.material.name == "pol_ghermez") {
+                        element3.material = lamp_ghermez;
                     }
+                    
+                })
+                
+            })
+                
+            
+        })
+        
 
-                }
-            }
-
-
-        }
-
-        for (let index = 1; index <= 7; index++) {
-            tezgah.push(scene.getObjectByName("tas" + index).material[1]);
-
-        }
-        // for (let index = 1; index <= 14; index++) {
-        //     ahshap.push(scene.getObjectByName("ahsap" + index).material[1]);
-
-        // }
-        // for (let index = 1; index <= 5; index++) {
-        //     parket.push(scene.getObjectByName("kaf" + index).material[1]);
-
-        // }
-
-        // for (let index = 1; index <= 4; index++) {
-
-        //     camera.getObjectByName("dayere" + index).material = tezgah[index]
-
-        // }
-
-        scene.add(camera)
         clearInterval(taghirrang_time);
     }
 
