@@ -10,13 +10,13 @@ import { PointerLockControls } from './jsm/controls/PointerLockControls.js';
 import { FBXLoader } from './jsm/loaders/FBXLoader.js';
 import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 import { RGBELoader } from './jsm/loaders/RGBELoader.js';
-import {EffectComposer} from './jsm/postprocessing/EffectComposer.js';
-import {RenderPass} from './jsm/postprocessing/RenderPass.js';
-import {UnrealBloomPass} from './jsm/postprocessing/UnrealBloomPass.js';
+import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+import { RenderPass } from './jsm/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from './jsm/postprocessing/UnrealBloomPass.js';
 import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
 
 let htriTextureURL = new URL('../textures/htri.exr.', import.meta.url);
-export let camera, scene, renderer, stats, controls, loader;
+export let camera, scene, renderer, stats, controls, loader, composer;
 
 
 const clock = new THREE.Clock();
@@ -32,6 +32,13 @@ let ahshap = [];
 let tezgah = [];
 let parket = [];
 
+const params = {
+    exposure: 1,
+    bloomstrength: 1.5,
+    bloomthreshold: 0,
+    bloomradius: 0
+
+}
 
 
 init();
@@ -54,7 +61,7 @@ function init() {
     /////camera/////
 
     camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 2000);
-    camera.rotation.set(0,0, 0)
+    camera.rotation.set(0, 0, 0)
     camera.position.set(100, 80, 0)
 
     // camera.lookAt(new THREE.Vector3(10, 0, 0))
@@ -110,34 +117,9 @@ function init() {
     controls.target.set(0, 80, 0);
     controls.update();
 
-    // controls = new PointerLockControls(camera, document.body);
+  
 
-    // add event listener to show/hide a UI (e.g. the game's menu)
-
-    // controls.addEventListener('lock', function () {
-
-    //     menu.style.display = 'none';
-
-    // });
-
-    // controls.addEventListener('unlock', function () {
-
-    //     menu.style.display = 'block';
-
-    // });
-
-    //////////////////////
-
-    /////  resize  //////
-
-    /////////////////////
-
-
-    //// stats  /////
-    stats = new Stats();
-    // container.appendChild(stats.dom);
-
-    ////////////////
+  
 
 
     ///// loader  /////
@@ -152,13 +134,12 @@ function init() {
     ///////////////////
 
     //////lights/////
-    var ambientlight = new THREE.AmbientLight(0xaaaaaa, 10);
-    // scene.add(ambientlight);
-
+    
+    
 
     addspotlight('light1', 1, new THREE.Color(1, 1, 1), new THREE.Vector3(100, 150, 0));
-    
-   
+
+
 
 
     //////////////////
@@ -167,8 +148,8 @@ function init() {
 
 
 
-    let object = new AddGltfmodels(2, "darvaze", "darvaze.glb", 0, 0, 0);
-   
+    let object = new AddPortal();
+
 
     let s_x = -innerWidth / 25;
     for (let index = 1; index <= 4; index++) {
@@ -185,7 +166,7 @@ function init() {
     }
 
 
-    
+
 
     ////////////////////////
 
@@ -195,48 +176,67 @@ function init() {
     ///////////////////
 
 
-    /////  tag fotos  /////
-
-
-
-    ///////////////////////
-    gui.add(scene.getObjectByName('light1').position, "x",0);
+   
+    gui.add(scene.getObjectByName('light1').position, "x", 0);
     gui.add(scene.getObjectByName('light1').position, 'y', 0);
     gui.add(scene.getObjectByName('light1').position, 'z', 0);
-   
+    ///////////  efect  /////////
 
+    const poinlight = new THREE.PointLight(0xffffff, 1);
+    camera.add(poinlight);
+
+    const renderScene = new RenderPass(scene,camera);
+
+    const bloomPass = new UnrealBloomPass(new THREE.Vector2(innerWidth,innerHeight),1.5,0.4,0.85);
+    bloomPass.threshold = params.bloomthreshold;
+    bloomPass.strength = params.bloomstrength;
+    bloomPass.radius = params.bloomradius;
+
+    composer = new EffectComposer(renderer);
+    composer.addPass(renderScene);
+    composer.addPass(bloomPass);
+
+    gui.add(params,'exposure',0.1,2).onChange(function(value){
+        renderer.toneMappingExposure = Math.pow(value,4.0);
+    })
+    gui.add(bloomPass,'threshold',0,100);
+    gui.add(bloomPass,'strength',0,100);
+    gui.add(bloomPass, 'radius', 0,100);
+    gui.add(poinlight,"power", 0,100);
+
+  
 
 }
 
 
 
 /////  select  /////
-window.addEventListener("click",e => {
+window.addEventListener("click", e => {
     select_animacions(e)
 });
-window.addEventListener("touchstart",e => {
+window.addEventListener("touchstart", e => {
     select_animacions(e.touches[0]);
 });
 function select_animacions(event) {
-        let raycaster = new THREE.Raycaster();
-        let click = new THREE.Vector2();
-    
-        
-        click.x = (event.layerX / innerWidth) * 2 - 1;
-        click.y = -(event.layerY / innerHeight) * 2 + 1;
-       
-        raycaster.setFromCamera(click, camera);
-        var intersects = raycaster.intersectObjects(scene.children);
-        if (intersects.length > 0) {
-            
-            
-            let name = intersects[0].object.name;
-            console.log(name);
-            let object = scene.getObjectByName(name)
-            objects[name].play(name);
-            console.log(object);
-           
-        }
+    let raycaster = new THREE.Raycaster();
+    let click = new THREE.Vector2();
+
+
+    click.x = (event.layerX / innerWidth) * 2 - 1;
+    click.y = -(event.layerY / innerHeight) * 2 + 1;
+
+    raycaster.setFromCamera(click, camera);
+    var intersects = raycaster.intersectObjects(scene.children);
+    if (intersects.length > 0) {
+
+
+        let name = intersects[0].object.name;
+        console.log(name);
+        let object = scene.getObjectByName(name)
+        objects[name].play(name);
+        console.log(object);
+
+    }
 }
 
 // document.getElementById("sahne").addEventListener("mousedown", onDocumentMouseDown2, false);
@@ -253,7 +253,7 @@ function onDocumentMouseDown2(event) {
 
 
             let object = scene.getObjectById(intersects[0].object.id - 1)
-            scene.getObjectById(intersects[0].object.id - 1).material[0]= tezgah[2]
+            scene.getObjectById(intersects[0].object.id - 1).material[0] = tezgah[2]
             console.log(object)
 
 
@@ -349,19 +349,19 @@ function addfbxmodels(tedad, name, path, x, y, z) {
     });
 
     ////////// GLB
-   
+
 }
 function Animacion(object) {
     this.object = object;
     this.tedad_animacion = this.object.animations.length;
     this.animacion_durum = 0;
 }
-Animacion.prototype.play = function(name) {
+Animacion.prototype.play = function (name) {
     let object = scene.getObjectByName(name);
-    if(this.animacion_durum > this.tedad_animacion-1) {
+    if (this.animacion_durum > this.tedad_animacion - 1) {
         this.animacion_durum = 0;
     }
-    if(this.tedad_animacion > 0 ){
+    if (this.tedad_animacion > 0) {
         mixer = new THREE.AnimationMixer(object);
         let action = mixer.clipAction(object.animations[this.animacion_durum]);
         action.setLoop(THREE.LoopOnce);
@@ -378,11 +378,11 @@ function AddGltfmodels(tedad, name, path, x, y, z) {
     this.loader = new GLTFLoader();
     this.loader.load('../house/' + path, function (object) {
 
-       
-       
+
+
         object.scene.name = name;
         object.scene.animations = object.animations;
-       
+
         object.scene.children.forEach(element => {
             object.animations.forEach(e => {
                 let name = element.name;
@@ -397,42 +397,55 @@ function AddGltfmodels(tedad, name, path, x, y, z) {
                     if (a == b) {
                         shomar++;
                     }
-                    
+
                 }
-                if(shomar == name1.length) {
+                if (shomar == name1.length) {
                     element.animations.push(e);
                 }
-                
+
             })
             // element.animations = object.animations;
             element.children.forEach(element_ => {
                 element_.animations = object.animations;
                 element_.name = element.name;
-               
+
             })
             objects[element.name] = new Animacion(element);
         });
-       
+
         // object.position.set(x, y, z);
 
 
         object.scene.castShadow = true;
         object.scene.receiveShadow = true;
 
-        // object.traverse(function (child) {
-
-        //     if (child.isMesh) {
-
-        //         child.castShadow = true;
-        //         child.receiveShadow = true;
-
-        //     }
-
-        // });
-       
-        scene.add(object.scene);
         
 
+        scene.add(object.scene);
+
+
+    });
+
+}
+
+function AddPortal() {
+    this.loader = new GLTFLoader();
+    this.loader.load('../house/ghofl.glb', function (object) {
+        object.scene.name = "portal";
+        object.scene.animations = object.animations;
+        mixer = new THREE.AnimationMixer(object.scene);
+        object.animations.forEach(e => {
+             let action = mixer.clipAction(e);
+            action.setLoop(THREE.LoopOnce);
+            // action.clampWhenFinished = true;
+            // action.enable = true;
+            action.play();
+        })
+       
+        // objects[element.name] = new Animacion(element);
+        object.scene.castShadow = true;
+        object.scene.receiveShadow = true;
+        scene.add(object.scene);
     });
 
 }
@@ -457,8 +470,8 @@ function animate() {
     if (mixer) mixer.update(delta);
 
     renderer.render(scene, camera);
+    composer.render();
 
-    stats.update();
 
 }
 
@@ -486,7 +499,7 @@ function taghirrang() {
         let lamp_ghermez = new THREE.MeshStandardMaterial({
             emissive: new THREE.Color("#ff0000"),
             color: new THREE.Color("#ff0000"),
-            
+
         });
 
         scene.children.forEach(element1 => {
@@ -495,14 +508,14 @@ function taghirrang() {
                     if (element3.material.name == "pol_ghermez") {
                         element3.material = lamp_ghermez;
                     }
-                    
+
                 })
-                
+
             })
-                
-            
+
+
         })
-        
+
 
         clearInterval(taghirrang_time);
     }
@@ -533,4 +546,6 @@ window.addEventListener("load", () => {
 
 
 ////////////////////
+
+
 
