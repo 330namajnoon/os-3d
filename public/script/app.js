@@ -62,7 +62,7 @@ function init() {
 
     camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 2000);
     camera.rotation.set(0, 0, 0)
-    camera.position.set(100, 80, 0)
+    camera.position.set(-30, 50, -30)
 
     // camera.lookAt(new THREE.Vector3(10, 0, 0))
 
@@ -114,7 +114,7 @@ function init() {
 
     ///// control  //////
     const controls = new OrbitControls(camera, renderer.domElement);
-    controls.target.set(0, 80, 0);
+    controls.target.set(-20, 30, -0);
     controls.update();
 
   
@@ -137,7 +137,7 @@ function init() {
     
     
 
-    addspotlight('light1', 1, new THREE.Color(1, 1, 1), new THREE.Vector3(100, 150, 0));
+    addspotlight('light1', 1, new THREE.Color(1, 1, 1), new THREE.Vector3(-140, 510, -183));
 
 
 
@@ -148,7 +148,7 @@ function init() {
 
 
 
-    let object = new AddPortal();
+    let object = new AddGltfmodels(1,"object","dolap.glb");
 
 
     let s_x = -innerWidth / 25;
@@ -177,32 +177,34 @@ function init() {
 
 
    
-    gui.add(scene.getObjectByName('light1').position, "x", 0);
-    gui.add(scene.getObjectByName('light1').position, 'y', 0);
-    gui.add(scene.getObjectByName('light1').position, 'z', 0);
+    // gui.add(scene.getObjectByName('light1').position, "x", -1000,1000);
+    // gui.add(scene.getObjectByName('light1').position, 'y', -1000,1000);
+    // gui.add(scene.getObjectByName('light1').position, 'z', -1000,1000);
+
+    
     ///////////  efect  /////////
 
-    const poinlight = new THREE.PointLight(0xffffff, 1);
-    camera.add(poinlight);
+    // const poinlight = new THREE.PointLight(0xffffff, 1);
+    // camera.add(poinlight);
 
-    const renderScene = new RenderPass(scene,camera);
+    // const renderScene = new RenderPass(scene,camera);
 
-    const bloomPass = new UnrealBloomPass(new THREE.Vector2(innerWidth,innerHeight),1.5,0.4,0.85);
-    bloomPass.threshold = params.bloomthreshold;
-    bloomPass.strength = params.bloomstrength;
-    bloomPass.radius = params.bloomradius;
+    // const bloomPass = new UnrealBloomPass(new THREE.Vector2(innerWidth,innerHeight),1.5,0.4,0.85);
+    // bloomPass.threshold = params.bloomthreshold;
+    // bloomPass.strength = params.bloomstrength;
+    // bloomPass.radius = params.bloomradius;
 
-    composer = new EffectComposer(renderer);
-    composer.addPass(renderScene);
-    composer.addPass(bloomPass);
+    // composer = new EffectComposer(renderer);
+    // composer.addPass(renderScene);
+    // composer.addPass(bloomPass);
 
-    gui.add(params,'exposure',0.1,2).onChange(function(value){
-        renderer.toneMappingExposure = Math.pow(value,4.0);
-    })
-    gui.add(bloomPass,'threshold',0,100);
-    gui.add(bloomPass,'strength',0,100);
-    gui.add(bloomPass, 'radius', 0,100);
-    gui.add(poinlight,"power", 0,100);
+    // gui.add(params,'exposure',0.1,2).onChange(function(value){
+    //     renderer.toneMappingExposure = Math.pow(value,4.0);
+    // })
+    // gui.add(bloomPass,'threshold',0,100);
+    // gui.add(bloomPass,'strength',0,100);
+    // gui.add(bloomPass, 'radius', 0,100);
+    // gui.add(poinlight,"power", 0,100);
 
   
 
@@ -294,63 +296,9 @@ function addspotlight(name, intensity, color, pos) {
 ///////////////////////
 
 /////  add objects  /////
-function addobject(name, w, h, d, x, y, z, color) {
-    /////object/////
-    const geometry = new THREE.BoxGeometry(w, h, d);
-    // const material = new THREE.MeshStandardMaterial({ color: color });
-    /////glass/////
-    const material = new THREE.MeshPhysicalMaterial({
-        roughness: 0,
-        transmission: .2, // Add transparency
-    });
-    //////////////  
-    const cube = new THREE.Mesh(geometry, material);
-    cube.name = name;
-    cube.position.x = x;
-    cube.position.y = y;
-    cube.position.z = z;
-    cube.castShadow = true;
-    cube.receiveShadow = true;
-
-    scene.add(cube);
-    ///////////////
-}
-
-function addfbxmodels(tedad, name, path, x, y, z) {
-    loader.load('../house/' + path, function (object) {
 
 
-        object.name = name;
 
-        actid.push(object.id);
-        actdurum.push(0)
-        tedadanim.push(tedad);
-
-        // object.position.set(x, y, z);
-
-
-        object.castShadow = true;
-        object.receiveShadow = true;
-
-        object.traverse(function (child) {
-
-            if (child.isMesh) {
-
-                child.castShadow = true;
-                child.receiveShadow = true;
-
-            }
-
-        });
-
-        scene.add(object);
-
-
-    });
-
-    ////////// GLB
-
-}
 function Animacion(object) {
     this.object = object;
     this.tedad_animacion = this.object.animations.length;
@@ -470,7 +418,7 @@ function animate() {
     if (mixer) mixer.update(delta);
 
     renderer.render(scene, camera);
-    composer.render();
+    // composer.render();
 
 
 }
