@@ -40,6 +40,8 @@ const params = {
 
 }
 
+let colors = {};
+
 
 init();
 animate();
@@ -463,6 +465,22 @@ function taghirrang() {
 
 
         })
+
+        scene.getObjectByName("object").children.forEach(e => {
+            let name = e.name;
+            if(name == "c1" || name == "c2" || name == "c3" || name == "c4") {
+                let c = {};
+                
+                e.children.forEach(e => {
+                    c[e.material.name] = e.material;
+                })
+                colors[name] = c;
+                console.log(colors)
+            }
+        
+        });
+
+        
 
 
         clearInterval(taghirrang_time);
