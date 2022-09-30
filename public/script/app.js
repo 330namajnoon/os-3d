@@ -119,9 +119,9 @@ function init() {
     controls.target.set(-20, 30, -0);
     controls.update();
 
-  
 
-  
+
+
 
 
     ///// loader  /////
@@ -136,8 +136,8 @@ function init() {
     ///////////////////
 
     //////lights/////
-    
-    
+
+
 
     addspotlight('light1', 1, new THREE.Color(1, 1, 1), new THREE.Vector3(-140, 510, -183));
 
@@ -150,7 +150,7 @@ function init() {
 
 
 
-    let object = new AddGltfmodels(1,"object","dolap.glb");
+    let object = new AddGltfmodels(1, "object", "dolap.glb");
 
 
     let s_x = -innerWidth / 25;
@@ -178,12 +178,12 @@ function init() {
     ///////////////////
 
 
-   
+
     // gui.add(scene.getObjectByName('light1').position, "x", -1000,1000);
     // gui.add(scene.getObjectByName('light1').position, 'y', -1000,1000);
     // gui.add(scene.getObjectByName('light1').position, 'z', -1000,1000);
 
-    
+
     ///////////  efect  /////////
 
     // const poinlight = new THREE.PointLight(0xffffff, 1);
@@ -208,7 +208,7 @@ function init() {
     // gui.add(bloomPass, 'radius', 0,100);
     // gui.add(poinlight,"power", 0,100);
 
-  
+
 
 }
 
@@ -234,18 +234,18 @@ function select_animacions(event) {
     if (intersects.length > 0) {
 
 
-        let name = intersects[0].object.name;
-        console.log(name);
-        let object = scene.getObjectByName(name)
-        objects[name].play(name);
-        console.log(object);
+        let object_ = intersects[0];
+        console.log(objects["object"])
+
+        objects["object"].play(object_);
+
 
     }
 }
 
 // document.getElementById("sahne").addEventListener("mousedown", onDocumentMouseDown2, false);
 function onDocumentMouseDown2(event) {
-    console.log(event)
+
     if (event.button == 0) {
         var mouse = new THREE.Vector2();
         mouse.x = (event.layerX / $('#sahne').width()) * 2 - 1;
@@ -258,7 +258,7 @@ function onDocumentMouseDown2(event) {
 
             let object = scene.getObjectById(intersects[0].object.id - 1)
             scene.getObjectById(intersects[0].object.id - 1).material[0] = tezgah[2]
-            console.log(object)
+
 
 
         }
@@ -298,29 +298,109 @@ function addspotlight(name, intensity, color, pos) {
 ///////////////////////
 
 /////  add objects  /////
-
+function Serch(obj, name) {
+    let element;
+    obj.forEach(e => {
+        if (e.name == name) {
+            element = e;
+        }
+    })
+    return element;
+}
 
 
 function Animacion(object) {
+
     this.object = object;
+    this.chekmece_anim = {
+        durum: "open",
+        open: ["cekmece"],
+        close: ["chekmece.001"]
+    }
+    this.colors_durum = {
+        durum: "open",
+        open: ["color", "color.001", "color.002", "color.003"],
+        close: ["colorr", "colorr.001", "colorr.002", "colorr.003"]
+    }
+
     this.tedad_animacion = this.object.animations.length;
     this.animacion_durum = 0;
 }
-Animacion.prototype.play = function (name) {
-    let object = scene.getObjectByName(name);
-    if (this.animacion_durum > this.tedad_animacion - 1) {
-        this.animacion_durum = 0;
-    }
-    if (this.tedad_animacion > 0) {
-        mixer = new THREE.AnimationMixer(object);
-        let action = mixer.clipAction(object.animations[this.animacion_durum]);
-        action.setLoop(THREE.LoopOnce);
-        action.clampWhenFinished = true;
-        action.enable = true;
+Animacion.prototype.play = function (object_) {
+    let name = object_.object.name;
+    let color = object_.object.name;
+    let color1 = color.split("");
+    let color2 = Number(color1[1]);
+    console.log(color2)
+    
+    let object = scene.getObjectByName("object");
 
-        action.play();
-        this.animacion_durum++;
+    console.log(object)
+
+    console.log(color2);
+    if (name == "Cube023" || name == "badane_ahsap" || name == "parket") {
+        console.log(this.colors_durum.durum)
+        mixer = new THREE.AnimationMixer(object);
+        let durum = this.colors_durum.durum;
+        this.colors_durum[durum].forEach(e_ => {
+            let action = mixer.clipAction(Serch(object.animations, e_));
+            action.setLoop(THREE.LoopOnce);
+            action.clampWhenFinished = true;
+            action.enable = true;
+            action.play();
+        })
+        if (this.colors_durum.durum == "open") {
+            this.colors_durum.durum = "close";
+        } else {
+            this.colors_durum.durum = "open";
+        }
     }
+    console.log(object)
+    if (color == "c" + color2 + "") {
+        let shomar = 0;
+        object.children.forEach(e => {
+
+            if (shomar !== 4 && shomar !== 5 && shomar !== 6 && shomar !== 7) {
+                console.log(e);
+                e.children.forEach(e1 => {
+                    if (e1.material.name == "duz") {
+                        e1.material = colors["c" + color2 + ""]["duz_" + color2 + ""];
+                        e1.material.name = "duz";
+                    }
+                    if (e1.material.name == "ahsap") {
+                        e1.material = colors["c" + color2 + ""]["ahsap_" + color2 + ""];
+                        e1.material.name = "ahsap";
+                    }
+                })
+                if (e.material !== undefined) {
+                    if (e.material.name == "duz") {
+                        e.material = colors["c" + color2 + ""]["duz_" + color2 + ""];
+                        e.material.name = "duz";
+                    }
+                    if (e.material.name == "ahsap") {
+                        e.material = colors["c" + color2 + ""]["ahsap_" + color2 + ""];
+                        e.material.name = "ahsap";
+                    }
+                }
+            }
+
+            shomar++;
+        })
+    }
+
+    // if (this.animacion_durum > this.tedad_animacion - 1) {
+    //     this.animacion_durum = 0;
+    // }
+    // if (this.tedad_animacion > 0) {
+    //     mixer = new THREE.AnimationMixer(object);
+    //     let action = mixer.clipAction(object.animations[this.animacion_durum]);
+    //     action.setLoop(THREE.LoopOnce);
+    //     action.clampWhenFinished = true;
+    //     action.enable = true;
+
+    //     action.play();
+    //     this.animacion_durum++;
+    // }
 }
 
 
@@ -333,43 +413,14 @@ function AddGltfmodels(tedad, name, path, x, y, z) {
         object.scene.name = name;
         object.scene.animations = object.animations;
 
-        object.scene.children.forEach(element => {
-            object.animations.forEach(e => {
-                let name = element.name;
-                let name1 = name.split("");
-                let name2 = e.name;
-                let name3 = name2.split("");
-                let name1_length = name1.length;
-                let shomar = 0;
-                for (let index = 0; index < name1.length; index++) {
-                    let a = name1[index];
-                    let b = name3[index];
-                    if (a == b) {
-                        shomar++;
-                    }
-
-                }
-                if (shomar == name1.length) {
-                    element.animations.push(e);
-                }
-
-            })
-            // element.animations = object.animations;
-            element.children.forEach(element_ => {
-                element_.animations = object.animations;
-                element_.name = element.name;
-
-            })
-            objects[element.name] = new Animacion(element);
-        });
-
+        objects[name] = new Animacion(object.scene);
         // object.position.set(x, y, z);
 
 
         object.scene.castShadow = true;
         object.scene.receiveShadow = true;
 
-        
+
 
         scene.add(object.scene);
 
@@ -378,27 +429,7 @@ function AddGltfmodels(tedad, name, path, x, y, z) {
 
 }
 
-function AddPortal() {
-    this.loader = new GLTFLoader();
-    this.loader.load('../house/ghofl.glb', function (object) {
-        object.scene.name = "portal";
-        object.scene.animations = object.animations;
-        mixer = new THREE.AnimationMixer(object.scene);
-        object.animations.forEach(e => {
-             let action = mixer.clipAction(e);
-            action.setLoop(THREE.LoopOnce);
-            // action.clampWhenFinished = true;
-            // action.enable = true;
-            action.play();
-        })
-       
-        // objects[element.name] = new Animacion(element);
-        object.scene.castShadow = true;
-        object.scene.receiveShadow = true;
-        scene.add(object.scene);
-    });
 
-}
 
 
 
@@ -430,7 +461,7 @@ function animate() {
 /////  taghir rang  /////
 let taghirrang_time = setInterval(taghirrang, 1000);
 function taghirrang() {
-    console.log(scene.children.length)
+
     if (scene.children.length >= 3) {
         // document.getElementById("laoding").remove();
         ////////
@@ -468,19 +499,21 @@ function taghirrang() {
 
         scene.getObjectByName("object").children.forEach(e => {
             let name = e.name;
-            if(name == "c1" || name == "c2" || name == "c3" || name == "c4") {
+            if (name == "c1" || name == "c2" || name == "c3" || name == "c4") {
                 let c = {};
-                
-                e.children.forEach(e => {
-                    c[e.material.name] = e.material;
+
+                e.children.forEach(e_ => {
+                    e_.name = e.name;
+                    c[e_.material.name] = e_.material;
                 })
                 colors[name] = c;
-                console.log(colors)
+
             }
-        
+
         });
 
-        
+
+
 
 
         clearInterval(taghirrang_time);
