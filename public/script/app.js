@@ -37,7 +37,6 @@ const params = {
     bloomstrength: 1.5,
     bloomthreshold: 0,
     bloomradius: 0
-
 }
 
 let colors = {};
@@ -49,7 +48,7 @@ animate();
 function init() {
 
     /////gui/////
-    var gui = new dat.GUI();
+    // var gui = new dat.GUI();
     // var folder = gui.addFolder('folder');
 
     /////////////
@@ -62,7 +61,7 @@ function init() {
 
     /////camera/////
 
-    camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 2000);
+    camera = new THREE.PerspectiveCamera(70, window.innerHeight / window.innerWidth, 1, 2000);
     camera.rotation.set(0, 0, 0)
     camera.position.set(-30, 50, -30)
 
@@ -87,7 +86,6 @@ function init() {
     mesh.rotation.x = - Math.PI / 2;
     mesh.receiveShadow = true;
     // scene.add(mesh);
-
     const grid = new THREE.GridHelper(2000, 20, 0x000000, 0x000000);
     grid.material.opacity = 0.2;
     grid.material.transparent = true;
@@ -104,12 +102,11 @@ function init() {
     // renderer.physicallyCorrectLights = true;
     renderer.outputEncoding = THREE.sRGBEncoding;
     renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.VSMShadowMap;
     renderer.toneMapping = THREE.ReinhardToneMapping;
     renderer.toneMappingExposure = 1;
     renderer.setPixelRatio(window.devicePixelRatio);
-
     renderer.setSize(window.innerWidth, window.innerHeight);
-
     container.appendChild(renderer.domElement);
     ////////////////////
 
@@ -139,7 +136,7 @@ function init() {
 
 
 
-    addspotlight('light1', 1, new THREE.Color(1, 1, 1), new THREE.Vector3(-140, 510, -183));
+    addspotlight('light1', 10, new THREE.Color(1, 1, 1), new THREE.Vector3(-140, 510, -183));
 
 
 
@@ -157,14 +154,11 @@ function init() {
     for (let index = 1; index <= 4; index++) {
         const geometry = new THREE.SphereGeometry(innerWidth / 100, 100, 100);
         const material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
-
         const sphere = new THREE.Mesh(geometry, material);
         sphere.position.set(s_x, -30, -40)
-
         sphere.name = "dayere" + index;
         camera.add(sphere);
         s_x += innerWidth / 40;
-
     }
 
 
@@ -179,9 +173,9 @@ function init() {
 
 
 
-    // gui.add(scene.getObjectByName('light1').position, "x", -1000,1000);
-    // gui.add(scene.getObjectByName('light1').position, 'y', -1000,1000);
-    // gui.add(scene.getObjectByName('light1').position, 'z', -1000,1000);
+    // gui.add(scene.getObjectByName('light1').position, "x", -1000, 1000);
+    // gui.add(scene.getObjectByName('light1').position, 'y', -1000, 1000);
+    // gui.add(scene.getObjectByName('light1').position, 'z', -1000, 1000);
 
 
     ///////////  efect  /////////
@@ -207,9 +201,6 @@ function init() {
     // gui.add(bloomPass,'strength',0,100);
     // gui.add(bloomPass, 'radius', 0,100);
     // gui.add(poinlight,"power", 0,100);
-
-
-
 }
 
 
@@ -224,28 +215,18 @@ window.addEventListener("touchstart", e => {
 function select_animacions(event) {
     let raycaster = new THREE.Raycaster();
     let click = new THREE.Vector2();
-
-
     click.x = (event.layerX / innerWidth) * 2 - 1;
     click.y = -(event.layerY / innerHeight) * 2 + 1;
-
     raycaster.setFromCamera(click, camera);
     var intersects = raycaster.intersectObjects(scene.children);
     if (intersects.length > 0) {
-
-
         let object_ = intersects[0];
-        console.log(objects["object"])
-
         objects["object"].play(object_);
-
-
     }
 }
 
 // document.getElementById("sahne").addEventListener("mousedown", onDocumentMouseDown2, false);
 function onDocumentMouseDown2(event) {
-
     if (event.button == 0) {
         var mouse = new THREE.Vector2();
         mouse.x = (event.layerX / $('#sahne').width()) * 2 - 1;
@@ -254,20 +235,10 @@ function onDocumentMouseDown2(event) {
         raycaster.setFromCamera(mouse, camera);
         var intersects = raycaster.intersectObjects(scene.children);
         if (intersects.length > 0) {
-
-
             let object = scene.getObjectById(intersects[0].object.id - 1)
             scene.getObjectById(intersects[0].object.id - 1).material[0] = tezgah[2]
-
-
-
         }
-
-
-
     }
-
-
 }
 
 
@@ -278,7 +249,7 @@ function onDocumentMouseDown2(event) {
 
 /////  add light  /////
 function addspotlight(name, intensity, color, pos) {
-    const spotLight = new THREE.SpotLight(0xffffff, .5);
+    let spotLight = new THREE.SpotLight(0xffffff,intensity);
     spotLight.name = name
     spotLight.position.set(pos.x, pos.y, pos.z);
     spotLight.castShadow = true;
@@ -287,12 +258,11 @@ function addspotlight(name, intensity, color, pos) {
     spotLight.shadow.camera.near = 500;
     spotLight.shadow.camera.far = 4000;
     spotLight.shadow.camera.fov = 30;
-    // spotLight.decay = 1000;
-    spotLight.power = 10;
+    spotLight.decay = 1000;
+    // spotLight.power = 10;
     // spotLight.distance = 1;
-
     scene.add(spotLight);
-    scene.add(new THREE.CameraHelper(spotLight.shadow.camera));
+    // scene.add(new THREE.CameraHelper(spotLight.shadow.camera));
 }
 
 ///////////////////////
@@ -310,12 +280,11 @@ function Serch(obj, name) {
 
 
 function Animacion(object) {
-
     this.object = object;
     this.chekmece_anim = {
-        durum: "open",
+        durum: "close",
         open: ["cekmece"],
-        close: ["chekmece.001"]
+        close: ["cekmece.001"]
     }
     this.colors_durum = {
         durum: "open",
@@ -331,15 +300,26 @@ Animacion.prototype.play = function (object_) {
     let color = object_.object.name;
     let color1 = color.split("");
     let color2 = Number(color1[1]);
-    console.log(color2)
-    
+
     let object = scene.getObjectByName("object");
-
-    console.log(object)
-
-    console.log(color2);
+    
+    if (name == "Cube027_1") {
+        mixer = new THREE.AnimationMixer(object);
+        let durum = this.chekmece_anim.durum;
+        this.chekmece_anim[durum].forEach(e_ => {
+            let action = mixer.clipAction(Serch(object.animations, e_));
+            action.setLoop(THREE.LoopOnce);
+            action.clampWhenFinished = true;
+            action.enable = true;
+            action.play();
+        })
+        if (this.chekmece_anim.durum == "open") {
+            this.chekmece_anim.durum = "close";
+        } else {
+            this.chekmece_anim.durum = "open";
+        }
+    }
     if (name == "Cube023" || name == "badane_ahsap" || name == "parket") {
-        console.log(this.colors_durum.durum)
         mixer = new THREE.AnimationMixer(object);
         let durum = this.colors_durum.durum;
         this.colors_durum[durum].forEach(e_ => {
@@ -355,13 +335,11 @@ Animacion.prototype.play = function (object_) {
             this.colors_durum.durum = "open";
         }
     }
-    console.log(object)
     if (color == "c" + color2 + "") {
         let shomar = 0;
         object.children.forEach(e => {
 
             if (shomar !== 4 && shomar !== 5 && shomar !== 6 && shomar !== 7) {
-                console.log(e);
                 e.children.forEach(e1 => {
                     if (e1.material.name == "duz") {
                         e1.material = colors["c" + color2 + ""]["duz_" + color2 + ""];
@@ -387,46 +365,28 @@ Animacion.prototype.play = function (object_) {
             shomar++;
         })
     }
-
-    // if (this.animacion_durum > this.tedad_animacion - 1) {
-    //     this.animacion_durum = 0;
-    // }
-    // if (this.tedad_animacion > 0) {
-    //     mixer = new THREE.AnimationMixer(object);
-    //     let action = mixer.clipAction(object.animations[this.animacion_durum]);
-    //     action.setLoop(THREE.LoopOnce);
-    //     action.clampWhenFinished = true;
-    //     action.enable = true;
-
-    //     action.play();
-    //     this.animacion_durum++;
-    // }
 }
 
 
 function AddGltfmodels(tedad, name, path, x, y, z) {
     this.loader = new GLTFLoader();
     this.loader.load('../house/' + path, function (object) {
-
-
-
         object.scene.name = name;
         object.scene.animations = object.animations;
-
         objects[name] = new Animacion(object.scene);
-        // object.position.set(x, y, z);
-
-
         object.scene.castShadow = true;
+        object.scene.traverse(function(node){
+            if(node.isMesh) {
+                node.castShadow = true;
+            }
+        })
+        object.scene.children.forEach(e => {
+            e.castShadow = true;
+        })
+        // object.position.set(x, y, z);
         object.scene.receiveShadow = true;
-
-
-
         scene.add(object.scene);
-
-
     });
-
 }
 
 
@@ -441,19 +401,11 @@ function AddGltfmodels(tedad, name, path, x, y, z) {
 
 
 function animate() {
-
     requestAnimationFrame(animate);
-
-
-
     const delta = clock.getDelta();
-
     if (mixer) mixer.update(delta);
-
     renderer.render(scene, camera);
     // composer.render();
-
-
 }
 
 //////////////////////////
@@ -461,9 +413,9 @@ function animate() {
 /////  taghir rang  /////
 let taghirrang_time = setInterval(taghirrang, 1000);
 function taghirrang() {
-
-    if (scene.children.length >= 3) {
-        // document.getElementById("laoding").remove();
+    
+    if (scene.children.length >= 2) {
+        document.getElementById("laoding").remove();
         ////////
         let shishe_sharab = new THREE.MeshPhysicalMaterial({ roughness: 0, transmission: 1, thickness: 2, color: new THREE.Color(0x121212) });
         let jame_sharab = new THREE.MeshPhysicalMaterial({
@@ -493,56 +445,35 @@ function taghirrang() {
                 })
 
             })
-
-
         })
 
         scene.getObjectByName("object").children.forEach(e => {
             let name = e.name;
             if (name == "c1" || name == "c2" || name == "c3" || name == "c4") {
                 let c = {};
-
                 e.children.forEach(e_ => {
                     e_.name = e.name;
                     c[e_.material.name] = e_.material;
                 })
                 colors[name] = c;
-
             }
 
         });
-
-
-
-
-
         clearInterval(taghirrang_time);
     }
-
-
 }
 
 /////////////////////////
-
-
-
 /////  resize  /////
 window.addEventListener("resize", (e) => {
-
-
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
-
     renderer.setSize(window.innerWidth, window.innerHeight);
 });
 
 window.addEventListener("load", () => {
     // document.getElementById("laoding").remove()
 })
-
-
-
-
 
 ////////////////////
 
