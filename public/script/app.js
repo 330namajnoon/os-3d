@@ -1,8 +1,6 @@
 
+
 import * as THREE from 'three';
-
-
-
 import Stats from './jsm/libs/stats.module.js';
 
 import { OrbitControls } from './jsm/controls/OrbitControls.js';
@@ -16,8 +14,10 @@ import { UnrealBloomPass } from './jsm/postprocessing/UnrealBloomPass.js';
 import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
 
 let htriTextureURL = new URL('../textures/htri.exr.', import.meta.url);
-export let camera, scene, renderer, stats, controls, loader, composer;
-
+let camera, scene, renderer, stats, controls, loader, composer;
+let laoding = document.getElementById("laoding");
+laoding.style.width = innerWidth+"px";
+laoding.style.height = innerHeight+"px";
 
 const clock = new THREE.Clock();
 
@@ -61,7 +61,7 @@ function init() {
 
     /////camera/////
 
-    camera = new THREE.PerspectiveCamera(70, window.innerHeight / window.innerWidth, 1, 2000);
+    camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 2000);
     camera.rotation.set(0, 0, 0)
     camera.position.set(-30, 50, -30)
 
