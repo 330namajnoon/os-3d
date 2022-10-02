@@ -398,7 +398,7 @@ function AddGltfmodels(tedad, name, path, x, y, z) {
 
 
 /////  animation  /////////
-
+console.log("")
 
 function animate() {
     requestAnimationFrame(animate);
