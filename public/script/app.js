@@ -338,8 +338,8 @@ Animacion.prototype.play = function (object_) {
     if (color == "c" + color2 + "") {
         let shomar = 0;
         object.children.forEach(e => {
-
-            if (shomar !== 4 && shomar !== 5 && shomar !== 6 && shomar !== 7) {
+            console.log(e)
+            if (shomar !== 5 && shomar !== 6 && shomar !== 7 && shomar !== 8) {
                 e.children.forEach(e1 => {
                     if (e1.material.name == "duz") {
                         e1.material = colors["c" + color2 + ""]["duz_" + color2 + ""];
