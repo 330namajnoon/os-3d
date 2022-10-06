@@ -14,10 +14,19 @@ import { UnrealBloomPass } from './jsm/postprocessing/UnrealBloomPass.js';
 import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
 
 let htriTextureURL = new URL('../textures/htri.exr.', import.meta.url);
+let sahne = document.getElementById("sahne");
 let camera, scene, renderer, stats, controls, loader, composer;
 let laoding = document.getElementById("laoding");
 laoding.style.width = innerWidth+"px";
 laoding.style.height = innerHeight+"px";
+
+let ch_durum = {
+    dikey: "portrait-primary",
+    yatay: "landscape-primary"
+}
+let charkhesh = document.getElementById("charkhesh");
+charkhesh.style.width = innerWidth+"px";
+charkhesh.style.height = innerHeight+"px";
 
 const clock = new THREE.Clock();
 
@@ -42,6 +51,8 @@ const params = {
 let colors = {};
 
 
+
+
 init();
 animate();
 
@@ -54,7 +65,7 @@ function init() {
     /////////////
 
     /////sahne/////
-    const container = document.getElementById('sahne');
+    const container = sahne;
 
     //////////////
 
@@ -415,7 +426,11 @@ let taghirrang_time = setInterval(taghirrang, 1000);
 function taghirrang() {
     
     if (scene.children.length >= 2) {
-        document.getElementById("laoding").remove();
+        window.addEventListener("orientationchange",(e)=> {
+            if(screen.orientation.type == ch_durum.yatay)charkhesh.remove();
+        })
+        if(screen.orientation.type == ch_durum.yatay)charkhesh.remove();
+        laoding.remove();
         ////////
         let shishe_sharab = new THREE.MeshPhysicalMaterial({ roughness: 0, transmission: 1, thickness: 2, color: new THREE.Color(0x121212) });
         let jame_sharab = new THREE.MeshPhysicalMaterial({
